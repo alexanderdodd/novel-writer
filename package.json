@@ -11,5 +11,8 @@
   "dependencies": {
     "@langchain/core": "^0.3.61",
     "langchain": "^0.3.29"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
   }
 }
