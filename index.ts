@@ -1,53 +1,17 @@
-import { HumanMessage, SystemMessage } from "@langchain/core/messages";
-import { ChatOllama } from "@langchain/ollama";
-import { ChatPromptTemplate } from "@langchain/core/prompts";
+import { generateStory } from "./src/workflow";
 
-
-
-const model = new ChatOllama({
-  model: "qwen3:0.6b",
-  temperature: 0
-});
-
-
-const messages = [
-  new SystemMessage("Translate the following from English into Italian"),
-  new HumanMessage("hi!"),
-];
-
-
+const fs = require("fs");
 async function main() {
-    // console.log("Starting the chat model...");
-    // const stream = await model.stream(messages);
+  const story = await generateStory("A restaurant in Mozambique");
 
-    // const reader = stream.getReader();
-    // const chunks = [];
-    // while (true) {
-    //     const { value: chunk, done } = await reader.read();
-    //     if (done) break;
-    //     chunks.push(chunk.content.valueOf());
-    // }
-    // console.log(chunks.join(''));
-
-
-    const systemTemplate = "Translate the following from English into {language}";
-    const promptTemplate = ChatPromptTemplate.fromMessages([
-        ["system", systemTemplate],
-        ["user", "{text}"],
-    ]);
-
-    const promptValue = await promptTemplate.invoke({
-        language: "italian",
-        text: "hi!",
-    });
-
-    console.log(promptValue.toChatMessages());
-
-
-    const response = await model.invoke(promptValue);
-    console.log(`${response.content}`);
-
+  let storyText = `${story.outline.title}\n\n`;
+  story.chapters.forEach((chapter) => {
+    storyText += `${chapter.title}\n\n${chapter.text}\n\n`;
+  });
+  fs.writeFileSync(
+    `/tmp/llmstories/${story.outline.title}-qwen314b.txt`,
+    storyText
+  );
 }
-
 
 main().catch(console.error);

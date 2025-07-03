@@ -1,12 +1,9 @@
 import { BaseChatModel } from "@langchain/core/language_models/chat_models";
-import { AIMessageChunk } from "@langchain/core/messages";
 import { JsonOutputParser } from "@langchain/core/output_parsers";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
+import { stripThinking } from "../shared/utils/qwen3.utils";
+import { Outline } from "../shared/models";
 
-interface Outline {
-  title: string;
-  outline: string;
-}
 export async function generateOutline(options: {
   storyIdea: string;
   model: BaseChatModel;
@@ -27,17 +24,4 @@ export async function generateOutline(options: {
     storyIdea: options.storyIdea,
   });
   return response;
-}
-
-function stripThinking(chunk: AIMessageChunk): AIMessageChunk {
-  if (chunk.content.toString().includes("<think>")) {
-    const content = removeTextBetweenTags(chunk.content.toString(), "think");
-    chunk.content = content;
-  }
-  return chunk;
-}
-
-function removeTextBetweenTags(text: string, tag: string): string {
-  const regex = new RegExp(`<${tag}>[\\s\\S]*?<\\/${tag}>`, "g");
-  return text.replace(regex, "");
 }
